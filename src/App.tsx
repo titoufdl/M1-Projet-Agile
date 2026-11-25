@@ -1,16 +1,19 @@
-import ParcoursupPage from './pages/ParcoursupPage';
+import { AxeVue } from './components/axe';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white px-4 py-4 sm:px-8">
-        <h1 className="text-xl font-bold tracking-tight text-slate-900">
+    <div className="min-h-screen bg-slate-50 p-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
           Tableau de bord — Poursuites d&apos;études &amp; Parcoursup 2025
         </h1>
-      </header>
-      <main>
-        <ParcoursupPage />
-      </main>
+
+        {/* Vues provisoires pour tester la bascule, à remplacer à l'intégration */}
+        <AxeVue
+          formations={<p className="text-slate-600">Vue Formations</p>}
+          candidatures={<p className="text-slate-600">Vue Candidatures</p>}
+        />
+      </div>
     </div>
   );
 }
