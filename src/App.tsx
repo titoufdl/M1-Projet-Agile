@@ -1,59 +1,68 @@
 import { useState } from 'react';
-import { AxeVue } from './components/axe';
+import { BarChart3, GraduationCap, LayoutDashboard } from 'lucide-react';
 import PoursuiteParType from './components/PoursuiteParType';
-import VoeuxParcoursup from './components/VoeuxParcoursup';
+import ParcoursupPage from './pages/ParcoursupPage';
+import VueGeneralePage, { type DashboardTab } from './pages/VueGeneralePage';
 
-type TabId = 'parcoursup' | 'poursuites';
+const TABS: Array<{ id: DashboardTab; label: string; Icon: typeof LayoutDashboard }> = [
+  { id: 'general', label: 'Vue générale', Icon: LayoutDashboard },
+  { id: 'poursuites', label: "Poursuites d'études", Icon: GraduationCap },
+  { id: 'parcoursup', label: 'Parcoursup 2025', Icon: BarChart3 },
+];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabId>('poursuites');
+  const [activeTab, setActiveTab] = useState<DashboardTab>('general');
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
-      <div className="mx-auto max-w-6xl space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Tableau de bord — Poursuites d&apos;études &amp; Parcoursup 2025
-          </h1>
+    <div className="min-h-screen bg-slate-50">
+      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-white">
+              <GraduationCap className="h-5 w-5" aria-hidden />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold tracking-tight text-slate-900">
+                Tableau de bord ESR
+              </h1>
+              <p className="text-xs text-slate-500">
+                Poursuites d&apos;études &amp; Parcoursup 2025
+              </p>
+            </div>
+          </div>
 
           <nav
-            aria-label="Vues du tableau de bord"
-            className="inline-flex rounded-lg border border-slate-200 bg-white p-1 shadow-xs"
+            aria-label="Navigation principale du tableau de bord"
+            className="inline-flex flex-wrap rounded-xl bg-slate-100 p-1"
           >
-            <button
-              type="button"
-              onClick={() => setActiveTab('poursuites')}
-              className={`rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                activeTab === 'poursuites'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Poursuites d&apos;études
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('parcoursup')}
-              className={`rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                activeTab === 'parcoursup'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Parcoursup 2025
-            </button>
+            {TABS.map(({ id, label, Icon }) => {
+              const active = activeTab === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  aria-current={active ? 'page' : undefined}
+                  onClick={() => setActiveTab(id)}
+                  className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition ${
+                    active
+                      ? 'bg-white text-indigo-700 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" aria-hidden />
+                  {label}
+                </button>
+              );
+            })}
           </nav>
         </div>
+      </header>
 
-        {activeTab === 'poursuites' ? (
-          <PoursuiteParType />
-        ) : (
-          <AxeVue
-            formations={<p className="text-slate-600">Vue Formations</p>}
-            candidatures={<VoeuxParcoursup />}
-          />
-        )}
-      </div>
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-8 sm:py-8">
+        {activeTab === 'general' && <VueGeneralePage onNavigate={setActiveTab} />}
+        {activeTab === 'poursuites' && <PoursuiteParType />}
+        {activeTab === 'parcoursup' && <ParcoursupPage />}
+      </main>
     </div>
   );
 }
