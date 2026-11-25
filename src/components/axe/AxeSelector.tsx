@@ -1,5 +1,5 @@
 import { GraduationCap, Users } from 'lucide-react';
-import { AXES, type Axe } from './axeIndicateurs';
+import { AXES, type Axe } from './axe';
 
 interface AxeSelectorProps {
   value: Axe;
@@ -25,7 +25,6 @@ export default function AxeSelector({ value, onChange }: AxeSelectorProps) {
             type="button"
             role="radio"
             aria-checked={actif}
-            title={axe.description}
             onClick={() => onChange(axe.value)}
             className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
               actif ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
