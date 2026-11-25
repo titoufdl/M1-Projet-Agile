@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BarChart3, GraduationCap, LayoutDashboard } from 'lucide-react';
-import PoursuiteParType from './components/PoursuiteParType';
 import ParcoursupPage from './pages/ParcoursupPage';
+import PoursuitesPage from './pages/PoursuitesPage';
 import VueGeneralePage, { type DashboardTab } from './pages/VueGeneralePage';
 
 const TABS: Array<{ id: DashboardTab; label: string; Icon: typeof LayoutDashboard }> = [
@@ -60,7 +60,7 @@ export default function App() {
 
       <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-8 sm:py-8">
         {activeTab === 'general' && <VueGeneralePage onNavigate={setActiveTab} />}
-        {activeTab === 'poursuites' && <PoursuiteParType />}
+        {activeTab === 'poursuites' && <PoursuitesPage />}
         {activeTab === 'parcoursup' && <ParcoursupPage />}
       </main>
     </div>
