@@ -104,7 +104,7 @@ export default function ParcoursupPage() {
   }
 
   return (
-    <section className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 sm:p-8">
+    <section className="flex w-full flex-col gap-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Parcoursup 2025</h2>
