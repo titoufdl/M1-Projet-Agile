@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-check:
+    name: Typecheck & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript typecheck
+        run: npx tsc -b
+
+      - name: Production build
+        run: npm run build
+
+      - name: Validate data files
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            for (const file of ["public/data/taux-poursuite.json", "public/data/parcoursup-2025.json"]) {
+              const data = JSON.parse(fs.readFileSync(file, "utf8"));
+              if (!Array.isArray(data) || data.length === 0) {
+                throw new Error(`${file} est vide ou invalide`);
+              }
+              console.log(`OK: ${file} (${data.length} entrées)`);
+            }
+          '
