@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
+import PoursuiteBacAcademie from '../components/PoursuiteBacAcademie';
 import PoursuiteParType from '../components/PoursuiteParType';
 import PoursuitePublicPrive from '../components/PoursuitePublicPrive';
 import { loadPoursuiteData } from '../services/dataLoader';
@@ -22,7 +23,8 @@ const EMPTY_FILTERS: PoursuiteFilters = {
 
 /**
  * Vue Poursuites d'études : filtres (session, voie du bac, académie, genre),
- * répartition par type de formation et comparaison Public / Privé.
+ * répartition par type de formation, comparaison par bac et par académie
+ * et comparaison Public / Privé.
  */
 export default function PoursuitesPage() {
   const [records, setRecords] = useState<PoursuiteRecord[] | null>(null);
@@ -160,6 +162,14 @@ export default function PoursuitesPage() {
       </div>
 
       <PoursuiteParType records={filtered} subtitle={scopeLabel} />
+
+      <hr className="border-slate-200" />
+
+      <PoursuiteBacAcademie
+        records={data}
+        filters={filters}
+        onFiltersChange={(patch) => setFilters((prev) => ({ ...prev, ...patch }))}
+      />
 
       <hr className="border-slate-200" />
 

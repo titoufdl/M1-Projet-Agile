@@ -59,7 +59,7 @@ export interface PoursuitePublicPriveSummary {
   parFiliere: FiliereSecteurStat[];
 }
 
-const TYPE_META: Array<{
+export const TYPE_META: Array<{
   id: TypeEtudeId;
   label: string;
   shortLabel: string;
@@ -325,4 +325,86 @@ export function computePoursuitePublicPrive(records: PoursuiteRecord[]): Poursui
     secteurs,
     parFiliere,
   };
+}
+
+/** Répartition des destinations d'un groupe de néo-bacheliers (filière de bac ou académie). */
+export interface DestinationsGroupe {
+  label: string;
+  bacheliers: number;
+  /** Taux de poursuite (peut dépasser 100 % localement, cf. mobilité entre académies). */
+  tauxPoursuite: number;
+  /** Part des néo-bacheliers sans inscription dans le supérieur (bornée à 0). */
+  sansPoursuitePct: number;
+  /** Part des néo-bacheliers par type de formation. */
+  parts: Record<TypeEtudeId, number>;
+}
+
+/** Ordre d'affichage naturel des voies du bac. */
+const ORDRE_VOIES_BAC = ['Bac général', 'Bac technologique', 'Bac professionnel'];
+
+function compareVoiesBac(a: string, b: string): number {
+  const ia = ORDRE_VOIES_BAC.indexOf(a);
+  const ib = ORDRE_VOIES_BAC.indexOf(b);
+  if (ia === -1 && ib === -1) return collator.compare(a, b);
+  return (ia === -1 ? Infinity : ia) - (ib === -1 ? Infinity : ib);
+}
+
+function computeDestinations(label: string, records: PoursuiteRecord[]): DestinationsGroupe {
+  let bacheliers = 0;
+  let poursuite = 0;
+  const effectifs: Record<TypeEtudeId, number> = { univ: 0, sts: 0, autres: 0, iut: 0, cpge: 0 };
+
+  for (const r of records) {
+    bacheliers += r.bacheliers;
+    poursuite += r.totalPoursuite;
+    for (const meta of TYPE_META) effectifs[meta.id] += meta.extract(r);
+  }
+
+  const parts = { ...effectifs };
+  for (const meta of TYPE_META) parts[meta.id] = pct(effectifs[meta.id], bacheliers);
+
+  return {
+    label,
+    bacheliers: Math.round(bacheliers),
+    tauxPoursuite: pct(poursuite, bacheliers),
+    sansPoursuitePct: pct(Math.max(0, bacheliers - poursuite), bacheliers),
+    parts,
+  };
+}
+
+function groupDestinations(
+  records: PoursuiteRecord[],
+  keyOf: (r: PoursuiteRecord) => string,
+): DestinationsGroupe[] {
+  const groups = new Map<string, PoursuiteRecord[]>();
+  for (const r of records) {
+    const key = keyOf(r);
+    if (!key) continue;
+    const list = groups.get(key);
+    if (list) list.push(r);
+    else groups.set(key, [r]);
+  }
+  return [...groups].map(([label, rows]) => computeDestinations(label, rows));
+}
+
+/** Que font les néo-bacheliers après le bac, selon leur voie de bac. */
+export function computeDestinationsParVoieBac(records: PoursuiteRecord[]): DestinationsGroupe[] {
+  return groupDestinations(records, (r) => r.voieBac).sort((a, b) =>
+    compareVoiesBac(a.label, b.label),
+  );
+}
+
+/** Que font les néo-bacheliers après le bac, selon leur académie. */
+export function computeDestinationsParAcademie(records: PoursuiteRecord[]): DestinationsGroupe[] {
+  return groupDestinations(records, (r) => r.academie).sort((a, b) =>
+    collator.compare(a.label, b.label),
+  );
+}
+
+/** Destinations de l'ensemble de la sélection. */
+export function computeDestinationsEnsemble(
+  records: PoursuiteRecord[],
+  label = 'Ensemble',
+): DestinationsGroupe {
+  return computeDestinations(label, records);
 }
