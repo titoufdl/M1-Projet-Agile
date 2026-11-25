@@ -1,4 +1,5 @@
 import { AxeVue } from './components/axe';
+import VoeuxParcoursup from './components/VoeuxParcoursup';
 
 export default function App() {
   return (
@@ -11,9 +12,10 @@ export default function App() {
         {/* Vues provisoires pour tester la bascule, à remplacer à l'intégration */}
         <AxeVue
           formations={<p className="text-slate-600">Vue Formations</p>}
-          candidatures={<p className="text-slate-600">Vue Candidatures</p>}
+          candidatures={<VoeuxParcoursup/>}
         />
       </div>
     </div>
+    
   );
 }
