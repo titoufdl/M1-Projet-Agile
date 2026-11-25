@@ -1,0 +1,142 @@
+.vp {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #1f2937;
+}
+
+.vp h2 {
+  margin: 0 0 1rem;
+}
+
+/* Filtres */
+.vp-filtres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.25rem;
+}
+
+.vp-filtres label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.vp-filtres select {
+  min-width: 260px;
+  max-width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.vp button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.vp button:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.vp button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Cartes de totaux */
+.vp-resume {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.vp-carte {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.vp-carte span {
+  display: block;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.vp-carte strong {
+  font-size: 1.4rem;
+}
+
+/* Tableau */
+.vp-table-wrap {
+  max-height: 600px;
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.vp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.vp-table thead th {
+  position: sticky;
+  top: 0;
+  padding: 0.75rem 1rem;
+  background: #1e3a8a;
+  color: #fff;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vp-table td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.vp-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.vp-table tbody tr:hover {
+  background: #eff6ff;
+}
+
+/* Colonnes de nombres alignées à droite */
+.vp-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.vp-vide {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Pagination */
+.vp-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
