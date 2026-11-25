@@ -1,4 +1,5 @@
 import ParcoursupPage from './pages/ParcoursupPage';
+import PoursuiteTypePage from './pages/PoursuiteTypePage';
 
 export default function App() {
   return (
@@ -9,6 +10,7 @@ export default function App() {
         </h1>
       </header>
       <main>
+        <PoursuiteTypePage />
         <ParcoursupPage />
       </main>
     </div>
