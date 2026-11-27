@@ -65,32 +65,29 @@ const sessionLabel = (l: unknown) => `Session ${String(l)}`;
 
 const AXIS_TICK = { fontSize: 12, fill: '#64748b' };
 
-/** Repères clés : arrivée de la génération 2000 (Millennials) en 2018 et Covid-19 en 2020. */
-function KeyEventMarkers(yAxisId?: string) {
-  return (
-    <>
-      <ReferenceLine
-        yAxisId={yAxisId}
-        x={2018}
-        stroke="#d97706"
-        strokeDasharray="4 4"
-        label={{
-          value: 'Millennials (gén. 2000)',
-          position: 'insideTopLeft',
-          fill: '#b45309',
-          fontSize: 11,
-        }}
-      />
-      <ReferenceLine
-        yAxisId={yAxisId}
-        x={2020}
-        stroke="#94a3b8"
-        strokeDasharray="4 4"
-        label={{ value: 'Covid-19', position: 'insideTopRight', fill: '#64748b', fontSize: 11 }}
-      />
-    </>
-  );
-}
+const MILLENNIALS_REF_PROPS = {
+  x: 2018,
+  stroke: '#d97706',
+  strokeDasharray: '4 4',
+  label: {
+    value: 'Millennials (2000)',
+    position: 'insideTopLeft' as const,
+    fill: '#b45309',
+    fontSize: 11,
+  },
+};
+
+const COVID_REF_PROPS = {
+  x: 2020,
+  stroke: '#94a3b8',
+  strokeDasharray: '4 4',
+  label: {
+    value: 'Covid-19',
+    position: 'insideTopRight' as const,
+    fill: '#64748b',
+    fontSize: 11,
+  },
+};
 
 function ChartCard({
   title,
@@ -338,7 +335,8 @@ export default function EvolutionPage() {
                   }
                 />
                 <Legend />
-                {KeyEventMarkers('taux')}
+                <ReferenceLine yAxisId="taux" {...MILLENNIALS_REF_PROPS} />
+                <ReferenceLine yAxisId="taux" {...COVID_REF_PROPS} />
                 <Bar
                   yAxisId="volume"
                   dataKey="bacheliers"
@@ -378,7 +376,8 @@ export default function EvolutionPage() {
                   <YAxis tickFormatter={(v: number) => `${v} %`} tick={AXIS_TICK} width={56} />
                   <Tooltip labelFormatter={sessionLabel} formatter={tooltipPct} />
                   <Legend />
-                  {KeyEventMarkers()}
+                  <ReferenceLine {...MILLENNIALS_REF_PROPS} />
+                  <ReferenceLine {...COVID_REF_PROPS} />
                   {typesOrdered.map((meta) => (
                     <Line
                       key={meta.id}
@@ -398,7 +397,8 @@ export default function EvolutionPage() {
                   <YAxis tickFormatter={(v: number) => nfCompact.format(v)} tick={AXIS_TICK} width={56} />
                   <Tooltip labelFormatter={sessionLabel} formatter={tooltipInt} />
                   <Legend />
-                  {KeyEventMarkers()}
+                  <ReferenceLine {...MILLENNIALS_REF_PROPS} />
+                  <ReferenceLine {...COVID_REF_PROPS} />
                   {typesOrdered.map((meta) => (
                     <Area
                       key={meta.id}
@@ -434,7 +434,8 @@ export default function EvolutionPage() {
                   />
                   <Tooltip labelFormatter={sessionLabel} formatter={tooltipPct} />
                   <Legend />
-                  {KeyEventMarkers()}
+                  <ReferenceLine {...MILLENNIALS_REF_PROPS} />
+                  <ReferenceLine {...COVID_REF_PROPS} />
                   {[...parVoie.keys]
                     .sort((a, b) => ORDRE_VOIES.indexOf(a) - ORDRE_VOIES.indexOf(b))
                     .map((key, i) => {
@@ -472,7 +473,8 @@ export default function EvolutionPage() {
                   />
                   <Tooltip labelFormatter={sessionLabel} formatter={tooltipPct} />
                   <Legend />
-                  {KeyEventMarkers()}
+                  <ReferenceLine {...MILLENNIALS_REF_PROPS} />
+                  <ReferenceLine {...COVID_REF_PROPS} />
                   {[...parGenre.keys].sort().map((key, i) => {
                     const dimmed = filters.genre !== '' && filters.genre !== key;
                     return (
