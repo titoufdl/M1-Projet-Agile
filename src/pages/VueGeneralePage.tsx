@@ -6,7 +6,7 @@ import { computeTotals } from '../services/parcoursupFilters';
 import { computePoursuiteParType, listPoursuiteAnnees } from '../services/poursuiteStats';
 import type { ParcoursupRecord, PoursuiteRecord } from '../types/data';
 
-export type DashboardTab = 'general' | 'poursuites' | 'parcoursup' | 'carte';
+export type DashboardTab = 'general' | 'poursuites' | 'evolution' | 'parcoursup' | 'carte';
 
 interface VueGeneralePageProps {
   onNavigate: (tab: DashboardTab) => void;
