@@ -74,6 +74,8 @@ export default function ParcoursupUniversite({ records }: ParcoursupUniversitePr
   const [onlyUniversites, setOnlyUniversites] = useState(true);
   const [searchEtab, setSearchEtab] = useState('');
   const [selectedEtab, setSelectedEtab] = useState<string>('');
+  const [searchFormation, setSearchFormation] = useState('');
+  const [selectedFiliere, setSelectedFiliere] = useState('');
   const [sortBy, setSortBy] = useState<SortKey>('tauxPression');
   const [sortDesc, setSortDesc] = useState(true);
 
@@ -99,9 +101,46 @@ export default function ParcoursupUniversite({ records }: ParcoursupUniversitePr
     [records, effectiveEtab],
   );
 
-  const sortedFormations = useMemo(() => {
+  const availableFilieres = useMemo(() => {
     if (!summary) return [];
-    const copy = [...summary.formations];
+    return [...new Set(summary.formations.map((f) => f.filiere))].sort((a, b) =>
+      a.localeCompare(b, 'fr'),
+    );
+  }, [summary]);
+
+  const effectiveFiliere = useMemo(
+    () => (selectedFiliere && availableFilieres.includes(selectedFiliere) ? selectedFiliere : ''),
+    [selectedFiliere, availableFilieres],
+  );
+
+  const filteredFormations = useMemo(() => {
+    if (!summary) return [];
+    const q = searchFormation.trim().toLowerCase();
+    return summary.formations.filter(
+      (f) =>
+        (!effectiveFiliere || f.filiere === effectiveFiliere) &&
+        (!q || f.formation.toLowerCase().includes(q) || f.filiere.toLowerCase().includes(q)),
+    );
+  }, [summary, effectiveFiliere, searchFormation]);
+
+  const filteredKpis = useMemo(() => {
+    let totalPlaces = 0;
+    let totalCandidatures = 0;
+    for (const f of filteredFormations) {
+      totalPlaces += f.places;
+      totalCandidatures += f.candidatures;
+    }
+    return {
+      nbFormations: filteredFormations.length,
+      totalPlaces,
+      totalCandidatures,
+      tauxPressionMoyen:
+        totalPlaces > 0 ? Math.round((totalCandidatures / totalPlaces) * 100) / 100 : null,
+    };
+  }, [filteredFormations]);
+
+  const sortedFormations = useMemo(() => {
+    const copy = [...filteredFormations];
     copy.sort((a, b) => {
       let cmp = 0;
       if (sortBy === 'formation') {
@@ -114,7 +153,7 @@ export default function ParcoursupUniversite({ records }: ParcoursupUniversitePr
       return sortDesc ? -cmp : cmp;
     });
     return copy;
-  }, [summary, sortBy, sortDesc]);
+  }, [filteredFormations, sortBy, sortDesc]);
 
   function handleSort(key: SortKey) {
     if (sortBy === key) {
@@ -183,14 +222,14 @@ export default function ParcoursupUniversite({ records }: ParcoursupUniversitePr
           </label>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-[1fr_2fr]">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-            Filtrer la liste
+            Rechercher une université
             <input
               type="search"
               value={searchEtab}
               onChange={(e) => setSearchEtab(e.target.value)}
-              placeholder="Ex. : La Rochelle, Bordeaux, Paris…"
+              placeholder="Ex. : La Rochelle, Bordeaux…"
               className="rounded-md border border-slate-300 px-3 py-2 font-normal"
             />
           </label>
@@ -199,12 +238,43 @@ export default function ParcoursupUniversite({ records }: ParcoursupUniversitePr
             Université / établissement ({nfInt.format(filteredEtablissements.length)})
             <select
               value={effectiveEtab}
-              onChange={(e) => setSelectedEtab(e.target.value)}
+              onChange={(e) => {
+                setSelectedEtab(e.target.value);
+                setSearchFormation('');
+                setSelectedFiliere('');
+              }}
               className="rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
             >
               {filteredEtablissements.map((e) => (
                 <option key={e} value={e}>
                   {e}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+            Filtrer par formation
+            <input
+              type="search"
+              value={searchFormation}
+              onChange={(e) => setSearchFormation(e.target.value)}
+              placeholder="Ex. : Informatique, Droit, Licence…"
+              className="rounded-md border border-slate-300 px-3 py-2 font-normal"
+            />
+          </label>
+
+          <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+            Type de formation
+            <select
+              value={effectiveFiliere}
+              onChange={(e) => setSelectedFiliere(e.target.value)}
+              className="rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
+            >
+              <option value="">Tous les types ({availableFilieres.length})</option>
+              {availableFilieres.map((f) => (
+                <option key={f} value={f}>
+                  {f}
                 </option>
               ))}
             </select>
@@ -219,19 +289,29 @@ export default function ParcoursupUniversite({ records }: ParcoursupUniversitePr
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatCard label="Formations" value={nfInt.format(summary.nbFormations)} />
-            <StatCard label="Places disponibles" value={nfInt.format(summary.totalPlaces)} />
-            <StatCard label="Candidatures totales" value={nfInt.format(summary.totalCandidatures)} />
+            <StatCard label="Formations" value={nfInt.format(filteredKpis.nbFormations)} />
+            <StatCard label="Places disponibles" value={nfInt.format(filteredKpis.totalPlaces)} />
+            <StatCard
+              label="Candidatures totales"
+              value={nfInt.format(filteredKpis.totalCandidatures)}
+            />
             <StatCard
               label="Taux de pression moyen"
               value={
-                summary.tauxPressionMoyen !== null
-                  ? `${nfDec2.format(summary.tauxPressionMoyen)} cand./place`
+                filteredKpis.tauxPressionMoyen !== null
+                  ? `${nfDec2.format(filteredKpis.tauxPressionMoyen)} cand./place`
                   : '—'
               }
               highlighted
             />
           </div>
+
+          {sortedFormations.length === 0 ? (
+            <div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+              Aucune formation ne correspond au filtre saisi pour {summary.etablissement}.
+            </div>
+          ) : (
+            <>
 
           {/* Graphiques côte à côte : Taux de pression & Répartition par filière de bac */}
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -462,6 +542,8 @@ export default function ParcoursupUniversite({ records }: ParcoursupUniversitePr
               </table>
             </div>
           </div>
+            </>
+          )}
         </>
       )}
     </section>
