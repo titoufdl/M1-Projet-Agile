@@ -21,7 +21,28 @@ import type { ParcoursupRecord } from '../types/data';
 const PAGE_SIZE = 50;
 const CHART_SIZE = 10;
 const nf = new Intl.NumberFormat('fr-FR');
-const nf1 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+const nf2 = new Intl.NumberFormat('fr-FR', {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 2,
+});
+
+function PressionBadge({ value }: { value: number | null }) {
+  if (value === null) {
+    return <span className="text-slate-400">—</span>;
+  }
+  const cls =
+    value >= 10
+      ? 'bg-red-50 text-red-700 ring-1 ring-red-200'
+      : value >= 3
+        ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
+        : 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200';
+
+  return (
+    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold tabular-nums ${cls}`}>
+      {nf2.format(value)}×
+    </span>
+  );
+}
 
 const AXIS_META: Record<
   ParcoursupAxis,
@@ -278,7 +299,7 @@ export default function ParcoursupPage() {
                   >
                     Candidatures
                   </th>
-                  <th className="px-4 py-3 text-right font-medium">Cand./place</th>
+                  <th className="px-4 py-3 text-right font-medium">Taux de pression</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -305,8 +326,10 @@ export default function ParcoursupPage() {
                     >
                       {nf.format(r.voeuxTotal)}
                     </td>
-                    <td className="px-4 py-2 text-right tabular-nums text-slate-600">
-                      {r.capacite > 0 ? nf1.format(r.voeuxTotal / r.capacite) : '—'}
+                    <td className="px-4 py-2 text-right">
+                      <PressionBadge
+                        value={r.capacite > 0 ? Math.round((r.voeuxTotal / r.capacite) * 100) / 100 : null}
+                      />
                     </td>
                   </tr>
                 ))}

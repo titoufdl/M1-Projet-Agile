@@ -65,17 +65,29 @@ const sessionLabel = (l: unknown) => `Session ${String(l)}`;
 
 const AXIS_TICK = { fontSize: 12, fill: '#64748b' };
 
-/** Repère la session 2020 (bac obtenu en contrôle continu, crise sanitaire). */
-function CovidMarker() {
-  return (
-    <ReferenceLine
-      x={2020}
-      stroke="#94a3b8"
-      strokeDasharray="4 4"
-      label={{ value: 'Covid-19', position: 'insideTopRight', fill: '#64748b', fontSize: 11 }}
-    />
-  );
-}
+const MILLENNIALS_REF_PROPS = {
+  x: 2018,
+  stroke: '#d97706',
+  strokeDasharray: '4 4',
+  label: {
+    value: 'Millennials',
+    position: 'top' as const,
+    fill: '#b45309',
+    fontSize: 11,
+  },
+};
+
+const COVID_REF_PROPS = {
+  x: 2020,
+  stroke: '#94a3b8',
+  strokeDasharray: '4 4',
+  label: {
+    value: 'Covid-19',
+    position: 'insideTopLeft' as const,
+    fill: '#64748b',
+    fontSize: 11,
+  },
+};
 
 function ChartCard({
   title,
@@ -299,7 +311,7 @@ export default function EvolutionPage() {
             description={`Néo-bacheliers : ${nfInt.format(debut.bacheliers)} en ${debut.annee} → ${nfInt.format(fin.bacheliers)} en ${fin.annee} (${nfSigned.format(summary.variationBacheliersPct)} %)`}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={summary.rows} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+              <ComposedChart data={summary.rows} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="annee" tick={AXIS_TICK} />
                 <YAxis
@@ -323,7 +335,8 @@ export default function EvolutionPage() {
                   }
                 />
                 <Legend />
-                <ReferenceLine yAxisId="taux" x={2020} stroke="#94a3b8" strokeDasharray="4 4" />
+                <ReferenceLine yAxisId="taux" {...MILLENNIALS_REF_PROPS} />
+                <ReferenceLine yAxisId="taux" {...COVID_REF_PROPS} />
                 <Bar
                   yAxisId="volume"
                   dataKey="bacheliers"
@@ -357,13 +370,14 @@ export default function EvolutionPage() {
           >
             <ResponsiveContainer width="100%" height="100%">
               {mode === 'taux' ? (
-                <LineChart data={summary.rows} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                <LineChart data={summary.rows} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="annee" tick={AXIS_TICK} />
                   <YAxis tickFormatter={(v: number) => `${v} %`} tick={AXIS_TICK} width={56} />
                   <Tooltip labelFormatter={sessionLabel} formatter={tooltipPct} />
                   <Legend />
-                  {CovidMarker()}
+                  <ReferenceLine {...MILLENNIALS_REF_PROPS} />
+                  <ReferenceLine {...COVID_REF_PROPS} />
                   {typesOrdered.map((meta) => (
                     <Line
                       key={meta.id}
@@ -377,13 +391,14 @@ export default function EvolutionPage() {
                   ))}
                 </LineChart>
               ) : (
-                <AreaChart data={summary.rows} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                <AreaChart data={summary.rows} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="annee" tick={AXIS_TICK} />
                   <YAxis tickFormatter={(v: number) => nfCompact.format(v)} tick={AXIS_TICK} width={56} />
                   <Tooltip labelFormatter={sessionLabel} formatter={tooltipInt} />
                   <Legend />
-                  {CovidMarker()}
+                  <ReferenceLine {...MILLENNIALS_REF_PROPS} />
+                  <ReferenceLine {...COVID_REF_PROPS} />
                   {typesOrdered.map((meta) => (
                     <Area
                       key={meta.id}
@@ -408,7 +423,7 @@ export default function EvolutionPage() {
               description="Comparaison des trois voies (le filtre « Voie du bac » met une voie en avant)"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={parVoie.rows} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                <LineChart data={parVoie.rows} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="annee" tick={AXIS_TICK} />
                   <YAxis
@@ -419,7 +434,8 @@ export default function EvolutionPage() {
                   />
                   <Tooltip labelFormatter={sessionLabel} formatter={tooltipPct} />
                   <Legend />
-                  {CovidMarker()}
+                  <ReferenceLine {...MILLENNIALS_REF_PROPS} />
+                  <ReferenceLine {...COVID_REF_PROPS} />
                   {[...parVoie.keys]
                     .sort((a, b) => ORDRE_VOIES.indexOf(a) - ORDRE_VOIES.indexOf(b))
                     .map((key, i) => {
@@ -446,7 +462,7 @@ export default function EvolutionPage() {
               description="Comparaison filles / garçons (le filtre « Genre » met un genre en avant)"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={parGenre.rows} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                <LineChart data={parGenre.rows} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="annee" tick={AXIS_TICK} />
                   <YAxis
@@ -457,7 +473,8 @@ export default function EvolutionPage() {
                   />
                   <Tooltip labelFormatter={sessionLabel} formatter={tooltipPct} />
                   <Legend />
-                  {CovidMarker()}
+                  <ReferenceLine {...MILLENNIALS_REF_PROPS} />
+                  <ReferenceLine {...COVID_REF_PROPS} />
                   {[...parGenre.keys].sort().map((key, i) => {
                     const dimmed = filters.genre !== '' && filters.genre !== key;
                     return (
@@ -481,8 +498,9 @@ export default function EvolutionPage() {
           <p className="text-xs text-slate-500">
             Source : MESR, « Taux de poursuite des néo-bacheliers dans l&apos;enseignement supérieur
             par académie ». Le taux rapporte les inscriptions dans le supérieur à la rentrée qui
-            suit le bac au nombre de néo-bacheliers de la session. La ligne pointillée marque la
-            session 2020 (bac en contrôle continu).
+            suit le bac au nombre de néo-bacheliers de la session. Les lignes pointillées marquent
+            l&apos;arrivée de la génération 2000 (Millennials) au bac en 2018 et la session 2020
+            (bac en contrôle continu, Covid-19).
           </p>
         </>
       )}
