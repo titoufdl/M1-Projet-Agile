@@ -54,7 +54,7 @@ const BAC_COLORS = {
 export default function ParcoursupNationalTable({ records }: ParcoursupNationalTableProps) {
   const [sortBy, setSortBy] = useState<SortKey>('candidatures');
   const [sortDesc, setSortDesc] = useState(true);
-  const [displayMode, setDisplayMode] = useState<DisplayMode>('effectifs');
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('pourcentages');
 
   const recap = useMemo(() => computeRecapNational(records), [records]);
 
@@ -128,19 +128,6 @@ export default function ParcoursupNationalTable({ records }: ParcoursupNationalT
           <button
             type="button"
             role="radio"
-            aria-checked={displayMode === 'effectifs'}
-            onClick={() => setDisplayMode('effectifs')}
-            className={`rounded-md px-3 py-1.5 transition ${
-              displayMode === 'effectifs'
-                ? 'bg-white text-indigo-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Effectifs prioritaires
-          </button>
-          <button
-            type="button"
-            role="radio"
             aria-checked={displayMode === 'pourcentages'}
             onClick={() => setDisplayMode('pourcentages')}
             className={`rounded-md px-3 py-1.5 transition ${
@@ -150,6 +137,19 @@ export default function ParcoursupNationalTable({ records }: ParcoursupNationalT
             }`}
           >
             Pourcentages prioritaires
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={displayMode === 'effectifs'}
+            onClick={() => setDisplayMode('effectifs')}
+            className={`rounded-md px-3 py-1.5 transition ${
+              displayMode === 'effectifs'
+                ? 'bg-white text-indigo-700 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Effectifs prioritaires
           </button>
         </div>
       </div>
