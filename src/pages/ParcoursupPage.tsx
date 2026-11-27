@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { RotateCcw } from 'lucide-react';
+import { Building2, Globe2, ListFilter, RotateCcw } from 'lucide-react';
 import AxisToggle from '../components/AxisToggle';
+import ParcoursupNationalTable from '../components/ParcoursupNationalTable';
+import ParcoursupUniversite from '../components/ParcoursupUniversite';
 import StatCard from '../components/StatCard';
 import { loadParcoursupData } from '../services/dataLoader';
 import {
@@ -33,13 +35,22 @@ function truncate(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text;
 }
 
+type ParcoursupSubView = 'exploration' | 'universite' | 'national';
+
+const SUB_VIEWS: Array<{ id: ParcoursupSubView; label: string; Icon: typeof ListFilter }> = [
+  { id: 'exploration', label: 'Exploration générale', Icon: ListFilter },
+  { id: 'universite', label: 'Détail par université', Icon: Building2 },
+  { id: 'national', label: 'Récapitulatif national', Icon: Globe2 },
+];
+
 /**
- * US02 — Vue Parcoursup 2025 : axe d'analyse Formations / Candidatures
- * et filtres par académie et par établissement.
+ * Vue Parcoursup 2025 : exploration générale (axe Formations/Candidatures),
+ * détail par université (taux de pression & part des bacheliers) et tableau national.
  */
 export default function ParcoursupPage() {
   const [records, setRecords] = useState<ParcoursupRecord[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [subView, setSubView] = useState<ParcoursupSubView>('exploration');
   const [axis, setAxis] = useState<ParcoursupAxis>('formations');
   const [filters, setFilters] = useState<ParcoursupFilters>(EMPTY_FILTERS);
   const [etabInput, setEtabInput] = useState('');
@@ -109,19 +120,53 @@ export default function ParcoursupPage() {
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Parcoursup 2025</h2>
           <p className="text-slate-600">
-            Formations et candidatures par établissement et par académie.
+            Formations, candidatures, taux de pression par université et récapitulatif national.
           </p>
         </div>
-        <AxisToggle
-          value={axis}
-          onChange={(next) => {
-            setAxis(next);
-            setVisible(PAGE_SIZE);
-          }}
-        />
+
+        <nav
+          aria-label="Sous-vues Parcoursup 2025"
+          className="inline-flex flex-wrap rounded-xl bg-slate-100 p-1"
+        >
+          {SUB_VIEWS.map(({ id, label, Icon }) => {
+            const active = subView === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                aria-current={active ? 'page' : undefined}
+                onClick={() => setSubView(id)}
+                className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition ${
+                  active
+                    ? 'bg-white text-indigo-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Icon className="h-4 w-4" aria-hidden />
+                {label}
+              </button>
+            );
+          })}
+        </nav>
       </header>
 
-      <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-[1fr_2fr_2fr_auto]">
+      {subView === 'universite' && <ParcoursupUniversite records={data} />}
+
+      {subView === 'national' && <ParcoursupNationalTable records={data} />}
+
+      {subView === 'exploration' && (
+        <>
+          <div className="flex justify-end">
+            <AxisToggle
+              value={axis}
+              onChange={(next) => {
+                setAxis(next);
+                setVisible(PAGE_SIZE);
+              }}
+            />
+          </div>
+
+          <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-[1fr_2fr_2fr_auto]">
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
           Académie
           <select
@@ -282,6 +327,8 @@ export default function ParcoursupPage() {
               )}
             </div>
           </div>
+        </>
+      )}
         </>
       )}
     </section>
