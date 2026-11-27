@@ -70,8 +70,8 @@ const MILLENNIALS_REF_PROPS = {
   stroke: '#d97706',
   strokeDasharray: '4 4',
   label: {
-    value: 'Millennials (2000)',
-    position: 'insideTopLeft' as const,
+    value: 'Millennials',
+    position: 'top' as const,
     fill: '#b45309',
     fontSize: 11,
   },
@@ -83,7 +83,7 @@ const COVID_REF_PROPS = {
   strokeDasharray: '4 4',
   label: {
     value: 'Covid-19',
-    position: 'insideTopRight' as const,
+    position: 'insideTopLeft' as const,
     fill: '#64748b',
     fontSize: 11,
   },
@@ -311,7 +311,7 @@ export default function EvolutionPage() {
             description={`Néo-bacheliers : ${nfInt.format(debut.bacheliers)} en ${debut.annee} → ${nfInt.format(fin.bacheliers)} en ${fin.annee} (${nfSigned.format(summary.variationBacheliersPct)} %)`}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={summary.rows} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+              <ComposedChart data={summary.rows} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="annee" tick={AXIS_TICK} />
                 <YAxis
@@ -370,7 +370,7 @@ export default function EvolutionPage() {
           >
             <ResponsiveContainer width="100%" height="100%">
               {mode === 'taux' ? (
-                <LineChart data={summary.rows} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                <LineChart data={summary.rows} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="annee" tick={AXIS_TICK} />
                   <YAxis tickFormatter={(v: number) => `${v} %`} tick={AXIS_TICK} width={56} />
@@ -391,7 +391,7 @@ export default function EvolutionPage() {
                   ))}
                 </LineChart>
               ) : (
-                <AreaChart data={summary.rows} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                <AreaChart data={summary.rows} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="annee" tick={AXIS_TICK} />
                   <YAxis tickFormatter={(v: number) => nfCompact.format(v)} tick={AXIS_TICK} width={56} />
@@ -423,7 +423,7 @@ export default function EvolutionPage() {
               description="Comparaison des trois voies (le filtre « Voie du bac » met une voie en avant)"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={parVoie.rows} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                <LineChart data={parVoie.rows} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="annee" tick={AXIS_TICK} />
                   <YAxis
@@ -462,7 +462,7 @@ export default function EvolutionPage() {
               description="Comparaison filles / garçons (le filtre « Genre » met un genre en avant)"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={parGenre.rows} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                <LineChart data={parGenre.rows} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="annee" tick={AXIS_TICK} />
                   <YAxis
