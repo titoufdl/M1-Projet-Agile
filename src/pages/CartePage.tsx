@@ -49,10 +49,22 @@ function FocusSelection({ point }: { point: EtablissementCarte | undefined }) {
  * US15 — Carte interactive d'une académie montrant le nombre de formations
  * Parcoursup 2025 proposées par chaque établissement.
  */
+type MarkerMode = 'couleur' | 'taille';
+
+const FIXED_RADIUS = 7;
+const FIXED_COLOR = '#4f46e5';
+const LEGEND_SIZES = [
+  { count: 1, label: '1 formation' },
+  { count: 5, label: '5 formations' },
+  { count: 15, label: '15 formations' },
+  { count: 30, label: '30 et plus' },
+] as const;
+
 export default function CartePage() {
   const [records, setRecords] = useState<ParcoursupRecord[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [academie, setAcademie] = useState('');
+  const [markerMode, setMarkerMode] = useState<MarkerMode>('couleur');
   const [selection, setSelection] = useState<string | null>(null);
 
   useEffect(() => {
@@ -96,24 +108,57 @@ export default function CartePage() {
             Nombre de formations Parcoursup 2025 proposées par chaque établissement.
           </p>
         </div>
-        <label className="flex min-w-0 flex-col gap-1 text-sm font-medium text-slate-700 sm:w-72">
-          Académie
-          <select
-            value={academie}
-            onChange={(e) => {
-              setAcademie(e.target.value);
-              setSelection(null);
-            }}
-            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
-          >
-            <option value="">Toutes les académies</option>
-            {academies.map((a) => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+            Représentation
+            <div
+              role="radiogroup"
+              aria-label="Mode de représentation des cercles"
+              className="inline-flex rounded-lg bg-slate-100 p-1"
+            >
+              {(
+                [
+                  ['couleur', 'Couleur'],
+                  ['taille', 'Taille'],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={markerMode === value}
+                  onClick={() => setMarkerMode(value)}
+                  className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                    markerMode === value
+                      ? 'bg-white text-indigo-700 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <label className="flex min-w-0 flex-col gap-1 text-sm font-medium text-slate-700 sm:w-72">
+            Académie
+            <select
+              value={academie}
+              onChange={(e) => {
+                setAcademie(e.target.value);
+                setSelection(null);
+              }}
+              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
+            >
+              <option value="">Toutes les académies</option>
+              {academies.map((a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -145,13 +190,14 @@ export default function CartePage() {
             <FocusSelection point={carte.etablissements.find((e) => e.key === selection)} />
             {[...carte.etablissements].reverse().map((e) => (
               <CircleMarker
-                key={e.key}
+                key={`${e.key}-${markerMode}`}
                 center={[e.lat, e.lon]}
-                radius={rayonMarqueur(e.formations)}
+                radius={markerMode === 'taille' ? rayonMarqueur(e.formations) : FIXED_RADIUS}
                 pathOptions={{
                   color: selection === e.key ? '#dc2626' : '#1e1b4b',
                   weight: selection === e.key ? 3 : 1,
-                  fillColor: couleurMarqueur(e.formations),
+                  fillColor:
+                    markerMode === 'couleur' ? couleurMarqueur(e.formations) : FIXED_COLOR,
                   fillOpacity: 0.8,
                 }}
                 eventHandlers={{ click: () => setSelection(e.key) }}
@@ -170,17 +216,43 @@ export default function CartePage() {
             ))}
           </MapContainer>
 
-          <div className="absolute bottom-3 left-3 z-[1000] rounded-lg bg-white/95 p-2 text-xs text-slate-700 shadow">
-            <p className="mb-1 font-medium">Nombre de formations</p>
-            {CLASSES_FORMATIONS.map((c) => (
-              <p key={c.label} className="flex items-center gap-2">
-                <span
-                  className="inline-block h-3 w-3 rounded-full border border-indigo-950"
-                  style={{ backgroundColor: c.color }}
-                />
-                {c.label}
-              </p>
-            ))}
+          <div className="absolute bottom-3 left-3 z-[1000] rounded-lg bg-white/95 p-2.5 text-xs text-slate-700 shadow">
+            <p className="mb-1.5 font-medium">Nombre de formations</p>
+            {markerMode === 'couleur' ? (
+              <div className="space-y-1">
+                {CLASSES_FORMATIONS.map((c) => (
+                  <p key={c.label} className="flex items-center gap-2">
+                    <span
+                      className="inline-block h-3 w-3 rounded-full border border-indigo-950"
+                      style={{ backgroundColor: c.color }}
+                    />
+                    {c.label}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                {LEGEND_SIZES.map((item) => {
+                  const d = Math.round(rayonMarqueur(item.count) * 1.4);
+                  return (
+                    <p key={item.label} className="flex items-center gap-2">
+                      <span className="flex w-7 items-center justify-center">
+                        <span
+                          className="inline-block rounded-full border border-indigo-950"
+                          style={{
+                            width: `${d}px`,
+                            height: `${d}px`,
+                            backgroundColor: FIXED_COLOR,
+                            opacity: 0.8,
+                          }}
+                        />
+                      </span>
+                      {item.label}
+                    </p>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
