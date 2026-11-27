@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { BarChart3, GraduationCap, LayoutDashboard } from 'lucide-react';
+import { BarChart3, GraduationCap, LayoutDashboard, Map as MapIcon } from 'lucide-react';
+import CartePage from './pages/CartePage';
 import ParcoursupPage from './pages/ParcoursupPage';
 import PoursuitesPage from './pages/PoursuitesPage';
 import VueGeneralePage, { type DashboardTab } from './pages/VueGeneralePage';
@@ -8,6 +9,7 @@ const TABS: Array<{ id: DashboardTab; label: string; Icon: typeof LayoutDashboar
   { id: 'general', label: 'Vue générale', Icon: LayoutDashboard },
   { id: 'poursuites', label: "Poursuites d'études", Icon: GraduationCap },
   { id: 'parcoursup', label: 'Parcoursup 2025', Icon: BarChart3 },
+  { id: 'carte', label: 'Carte', Icon: MapIcon },
 ];
 
 export default function App() {
@@ -62,6 +64,7 @@ export default function App() {
         {activeTab === 'general' && <VueGeneralePage onNavigate={setActiveTab} />}
         {activeTab === 'poursuites' && <PoursuitesPage />}
         {activeTab === 'parcoursup' && <ParcoursupPage />}
+        {activeTab === 'carte' && <CartePage />}
       </main>
     </div>
   );
